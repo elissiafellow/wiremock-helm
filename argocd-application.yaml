@@ -20,9 +20,8 @@ spec:
         valueFiles:
           - values.yaml
     # Source 2: Values file repository
-    # Update this with your Git repository URL where values.yaml is stored
-    - repoURL: https://github.com/elissiafellow/wiremock-helm  # TODO: Update with your values repo URL
-      path: wiremock-helm  # TODO: Update with the path to your values.yaml directory
+    - repoURL: https://github.com/elissiafellow/wiremock-helm
+      path: .  # values.yaml is at the root of the repository
       targetRevision: HEAD  # Or specify a branch/tag
       ref: valuesRepo  # Reference name for the values repository
   
