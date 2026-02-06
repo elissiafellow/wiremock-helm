@@ -16,14 +16,16 @@ spec:
       targetRevision: HEAD  # Or specify a specific version/tag like "v1.0.0"
       helm:
         releaseName: wiremock
-        # Reference values file from the values repository
-        valueFiles:
-          - values.yaml
     # Source 2: Values file repository
     - repoURL: https://github.com/elissiafellow/wiremock-helm
       path: .  # values.yaml is at the root of the repository
       targetRevision: HEAD  # Or specify a branch/tag
       ref: valuesRepo  # Reference name for the values repository
+  
+  # Reference values file from the values repository using the ref
+  sourcesHelm:
+    valueFiles:
+      - $valuesRepo/values.yaml
   
   destination:
     server: https://kubernetes.default.svc
