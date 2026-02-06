@@ -1,0 +1,306 @@
+# Default values for WireMock.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+mappings:
+  # Example mapping (for reference):
+  #  custom_mapping.json: |
+  #    {
+  #      "request": {
+  #        "method": "POST",
+  #        "url": "/v1/custom-mapping"
+  #      },
+  #      "response":{
+  #        "status":200,
+  #        "bodyFileName":"responses/custom_response.json",
+  #        "headers":{
+  #          "Content-Type":"application/json"
+  #        }
+  #      }
+  #    }
+  
+  # NI API Mappings
+  getPersonInfoByMnfId-success.json: |
+    {
+      "priority": 10,
+      "request": {
+        "method": "POST",
+        "urlPath": "/api/v1/MFCard/getPersonInfoByMnfId",
+        "bodyPatterns": [
+          { "matchesJsonPath": "$[?(@.mnfuuid != '')]" }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "bodyFileName": "getPersonInfoByMnfId-success.json"
+      }
+    }
+  getPersonInfoByMnfId-empty-uuid.json: |
+    {
+      "priority": 1,
+      "request": {
+        "method": "POST",
+        "urlPath": "/api/v1/MFCard/getPersonInfoByMnfId",
+        "bodyPatterns": [
+          {
+            "matchesJsonPath": {
+              "expression": "$.mnfuuid",
+              "equalTo": ""
+            }
+          }
+        ]
+      },
+      "response": {
+        "status": 400,
+        "headers": { "Content-Type": "application/json" },
+        "bodyFileName": "getPersonInfoByMnfId-empty-uuid.json"
+      }
+    }
+
+responses:
+  # Example response (for reference):
+  #  custom_response.json: |
+  #    {
+  #      "message": "Here is my custom response!"
+  #    }
+  
+  # NI API Responses
+  getPersonInfoByMnfId-success.json: |
+    {
+      "data": {
+        "personId": "1102065",
+        "mnfuuid": "1102065",
+        "name": "Payment  automation",
+        "identityType": "NationalId",
+        "identity": "29312312312312",
+        "country": "EGYPT",
+        "phoneNumber": "+201190000002",
+        "accounts": [
+          {
+            "type": "MC Credit Card A/C (840)",
+            "accountNo": "MC_Prep_EGP_11278004",
+            "status": "Open",
+            "accountUID": null,
+            "currency": "EGP",
+            "remainingBalance": -250,
+            "availableBalance": -250,
+            "ledgerBalance": null,
+            "overdraft": 0
+          }
+        ],
+        "cards": [
+          {
+            "pan": "2232808031025382",
+            "maskedPAN": "2232********5382",
+            "mbr": "0",
+            "statusFO": 1,
+            "statusFOName": "Opened",
+            "statusBO": 4,
+            "statusBOName": "Given",
+            "cardGUID": "{250EBC55-4A65-0EAB-E064-00144FFA433E}",
+            "cardUID": "250EBC554A650EABE06400144FFA433E",
+            "expDate": "28/02/2027",
+            "accountNo": "MC_Prep_EGP_11278004",
+            "currency": "EGP",
+            "remainingBalance": -250,
+            "availableBalance": -250,
+            "ledgerBalance": null,
+            "overdraft": 0,
+            "issuancePriority": 0,
+            "colorName": "Blue"
+          }
+        ]
+      },
+      "count": 1,
+      "responseCode": 2020,
+      "statusCode": 200,
+      "responseMessage": "Success",
+      "errors": null
+    }
+  getPersonInfoByMnfId-empty-uuid.json: |
+    {
+      "responseCode": 4001,
+      "statusCode": 400,
+      "responseMessage": "mnfuuid is required",
+      "errors": [
+        { "field": "mnfuuid", "message": "must not be empty" }
+      ]
+    }
+
+replicaCount: 1
+
+revisionHistoryLimit: 10
+
+image:
+  repository: wiremock/wiremock
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: latest
+  pullPolicy: IfNotPresent
+
+initContainer:
+  image:
+    repository: busybox
+    tag: latest
+    pullPolicy: Always
+  resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  #  limits:
+  #    cpu: 100m
+  #    memory: 128Mi
+  #  requests:
+  #    cpu: 100m
+  #    memory: 128Mi
+  extraVolumeMounts: {}
+
+extraInitContainers: []
+
+deploymentStrategy: {}
+# type: Recreate
+
+# Load mappings from the templated configmap
+mappingsFromConfigmap: true
+
+# Load mappings from the templated configmap
+responsesFromConfigmap: true
+
+persistence:
+  mappings:
+    enabled: false
+    accessModes: ["ReadWriteOnce"]
+    size: 10Gi
+    # storageClassName: "-"
+  responses:
+    enabled: false
+    accessModes: ["ReadWriteOnce"]
+    size: 10Gi
+    # storageClassName: "-"
+
+extraVolumes: {}
+
+extraVolumeMounts: {}
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+labels: {}
+podLabels: {}
+podAnnotations: {}
+
+podSecurityContext: {}
+#  fsGroupChangePolicy: Always
+#  sysctls: []
+#  supplementalGroups: []
+#  fsGroup: 2000
+
+securityContext: {}
+#  seLinuxOptions: {}
+#  runAsUser: 1000
+#  runAsGroup: 2000
+#  runAsNonRoot: true
+#  privileged: false
+#  readOnlyRootFilesystem: true
+#  allowPrivilegeEscalation: false
+#  capabilities:
+#    drop: ["ALL"]
+#  seccompProfile:
+#    type: "RuntimeDefault"
+
+service:
+  type: NodePort  # Changed to NodePort for localhost testing (was ClusterIP)
+  externalPort: 8082  # Changed from 9021 to match NI API port
+  internalPort: 8082  # Changed from 9021 to match NI API port
+
+ingress:
+  enabled: true  # Enable ingress for localhost testing (was false)
+  className: "nginx"  # Use nginx for localhost (or your ingress controller)
+  annotations: {}
+  #  kubernetes.io/ingress.class: nginx
+  #  kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: wiremock.local  # Changed from chart-example.local
+      paths:
+        - path: /
+          pathType: Prefix  # Changed from ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - wiremock.local
+
+env: {}
+
+args:
+  - "--port=8082"  # Changed from 9021 to match NI API port
+  - "--max-request-journal=1000"
+  - "--global-response-templating"  # Changed from --local-response-templating
+  - "--root-dir=/home/wiremock/storage"
+
+resources: {}
+# We usually recommend not to specify default resources and to leave this as a conscious
+# choice for the user. This also increases chances charts run on environments with little
+# resources, such as Minikube. If you do want to specify resources, uncomment the following
+# lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+#  limits:
+#    cpu: 100m
+#    memory: 128Mi
+#  requests:
+#    cpu: 100m
+#    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+scheme: "HTTP"
+
+# extraObjects could be utilized to add dynamic manifests via values
+extraObjects: []
+# Examples:
+# extraObjects:
+# - apiVersion: kubernetes-client.io/v1
+#   kind: ExternalSecret
+#   metadata:
+#     name: wiremock-config-{{ .Release.Name }}
+#   spec:
+#     backendType: gcpSecretsManager
+#     data:
+#     - remoteRef:
+#         key: wiremock-config
+#         property: config.json
+#       secretKey: wiremock-config-gcp
+# Alternatively, you can use strings, which lets you use additional templating features:
+# extraObjects:
+# - |
+#   apiVersion: kubernetes-client.io/v1
+#   kind: ExternalSecret
+#   metadata:
+#     name: wiremock-config-{{ .Release.Name }}
+#   spec:
+#     backendType: gcpSecretsManager
+#     data:
+#     - remoteRef:
+#         key: wiremock-config
+#         property: config.json
+#       secretKey: {{ include "some-other-template" }}

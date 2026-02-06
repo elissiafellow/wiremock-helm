@@ -1,0 +1,45 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: wiremock
+  namespace: argocd
+  # Optional: Add finalizers for cascade deletion
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  
+  sources:
+    # Source 1: Helm chart repository
+    - repoURL: https://github.com/wiremock/helm-charts
+      path: charts/wiremock
+      targetRevision: HEAD  # Or specify a specific version/tag like "v1.0.0"
+      helm:
+        releaseName: wiremock
+        # Reference values file from the values repository
+        valueFiles:
+          - values.yaml
+    # Source 2: Values file repository
+    # Update this with your Git repository URL where values.yaml is stored
+    - repoURL: https://github.com/elissiafellow/wiremock-helm  # TODO: Update with your values repo URL
+      path: wiremock-helm  # TODO: Update with the path to your values.yaml directory
+      targetRevision: HEAD  # Or specify a branch/tag
+      ref: valuesRepo  # Reference name for the values repository
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: wiremock
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
